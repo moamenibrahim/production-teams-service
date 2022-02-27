@@ -18,17 +18,17 @@ func SetupHandlers() {
 
 	muxRouter.HandleFunc("/users", router.GetUsers).Methods("GET")
 	muxRouter.HandleFunc("/users", router.CreateUser).Methods("POST")
-	muxRouter.HandleFunc("/users/{userid}", router.GetUser).Methods("GET")
+	muxRouter.HandleFunc("/users/{username}", router.GetUser).Methods("GET")
 	muxRouter.HandleFunc("/users/{userid}", router.DeleteUser).Methods("DELETE")
 
 	muxRouter.HandleFunc("/hubs", router.GetHubs).Methods("GET")
 	muxRouter.HandleFunc("/hubs", router.CreateHub).Methods("POST")
-	muxRouter.HandleFunc("/hubs/{hubid}", router.GetHub).Methods("GET")
+	muxRouter.HandleFunc("/hubs/{hubname}", router.GetHub).Methods("GET")
 	muxRouter.HandleFunc("/hubs/{hubid}", router.DeleteHub).Methods("DELETE")
 
 	muxRouter.HandleFunc("/teams", router.GetTeams).Methods("GET")
 	muxRouter.HandleFunc("/teams", router.CreateTeam).Methods("POST")
-	muxRouter.HandleFunc("/teams/{teamid}", router.GetTeam).Methods("GET")
+	muxRouter.HandleFunc("/teams/{teamname}", router.GetTeam).Methods("GET")
 	muxRouter.HandleFunc("/teams/{teamid}", router.DeleteTeam).Methods("DELETE")
 
 	// Serve the app

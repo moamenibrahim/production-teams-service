@@ -48,7 +48,7 @@ func CreateHub(w http.ResponseWriter, r *http.Request) {
 
 	var response = models.HubResponse{}
 	if hubID == "" || hubName == "" {
-		response = models.HubResponse{Type: "error", Message: "You are missing hubID or hubName parameter."}
+		response = models.HubResponse{Type: "error", Message: "You are missing hubiD or hubname parameter."}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
@@ -100,26 +100,25 @@ func DeleteHub(w http.ResponseWriter, r *http.Request) {
 
 func GetHub(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	hubID := params["hubid"]
+	hubName := params["hubname"]
 	var response = models.HubResponse{}
-	if hubID == "" {
-		response = models.HubResponse{Type: "error", Message: "You are missing hubID parameter."}
+	if hubName == "" {
+		response = models.HubResponse{Type: "error", Message: "You are missing hubname parameter."}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
 		fmt.Println("Getting hub from DB")
 
-		var ID string
-		var hubName string
+		var hubID string
 		var geoLocation string
-		err := db.QueryRow("SELECT id, name, geo_location FROM hubs WHERE name=$1", hubName).Scan(&ID, &hubName, &geoLocation)
+		err := db.QueryRow("SELECT id, name, geo_location FROM hubs WHERE name=$1", hubName).Scan(&hubID, &hubName, &geoLocation)
 		if err != nil {
 			utils.CheckErr(w, r, err)
 			return
 		}
 
 		hubs := []models.Hub{}
-		hubs = append(hubs, models.Hub{ID: ID, Name: hubName, GeoLocation: geoLocation})
+		hubs = append(hubs, models.Hub{ID: hubID, Name: hubName, GeoLocation: geoLocation})
 		response = models.HubResponse{Type: "success", Data: hubs, Message: "The hub has been deleted successfully!"}
 	}
 	json.NewEncoder(w).Encode(response)

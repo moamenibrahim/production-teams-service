@@ -100,26 +100,25 @@ func DeleteTeam(w http.ResponseWriter, r *http.Request) {
 
 func GetTeam(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	teamID := params["teamid"]
+	teamName := params["teamname"]
 	var response = models.TeamResponse{}
-	if teamID == "" {
-		response = models.TeamResponse{Type: "error", Message: "You are missing teamID parameter."}
+	if teamName == "" {
+		response = models.TeamResponse{Type: "error", Message: "You are missing teamname parameter."}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
 		fmt.Println("Getting team from DB")
 
-		var ID string
-		var teamName string
+		var teamID string
 		var teamType string
-		err := db.QueryRow("SELECT id, name, team_type FROM teams WHERE name=$1", teamID).Scan(&ID, &teamName, &teamType)
+		err := db.QueryRow("SELECT id, name, team_type FROM teams WHERE name=$1", teamName).Scan(&teamID, &teamName, &teamType)
 		if err != nil {
 			utils.CheckErr(w, r, err)
 			return
 		}
 
 		teams := []models.Team{}
-		teams = append(teams, models.Team{ID: ID, Name: teamName, TeamType: teamType})
+		teams = append(teams, models.Team{ID: teamID, Name: teamName, TeamType: teamType})
 		response = models.TeamResponse{Type: "success", Data: teams}
 	}
 	json.NewEncoder(w).Encode(response)

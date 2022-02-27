@@ -100,26 +100,25 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userID := params["userid"]
+	userName := params["username"]
 	var response = models.UserResponse{}
-	if userID == "" {
-		response = models.UserResponse{Type: "error", Message: "You are missing userID parameter."}
+	if userName == "" {
+		response = models.UserResponse{Type: "error", Message: "You are missing userName parameter."}
 		json.NewEncoder(w).Encode(response)
 		return
 	} else {
 		fmt.Println("Getting user from DB")
 
-		var ID string
-		var userName string
+		var userID string
 		var userRole string
-		err := db.QueryRow("SELECT id, name, role FROM users WHERE name=$1", userID).Scan(&ID, &userName, &userRole)
+		err := db.QueryRow("SELECT id, name, role FROM users WHERE name=$1", userName).Scan(&userID, &userName, &userRole)
 		if err != nil {
 			utils.CheckErr(w, r, err)
 			return
 		}
 
 		users := []models.User{}
-		users = append(users, models.User{ID: ID, Name: userName, Role: userRole})
+		users = append(users, models.User{ID: userID, Name: userName, Role: userRole})
 		response = models.UserResponse{Type: "success", Data: users}
 	}
 	json.NewEncoder(w).Encode(response)
