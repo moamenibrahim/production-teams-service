@@ -6,8 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
+env:
+  HOST: postgres
 
+jobs:
   build:
     runs-on: ubuntu-latest
     services:
@@ -36,3 +38,7 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+      env:
+        HOST: postgres
+        POSTGRES_HOST: postgres
+        POSTGRES_PORT: 5432
