@@ -1,13 +1,14 @@
 package main
 
 import (
-	"log"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 func newTestServer(path string, h func(w http.ResponseWriter, r *http.Request)) *httptest.Server {
@@ -17,21 +18,20 @@ func newTestServer(path string, h func(w http.ResponseWriter, r *http.Request)) 
     return server
 }
 
-// You can use testing.T, if you want to test the code without benchmarking
-func setupSuite(tb testing.TB) func(tb testing.TB) {
+type MySuite struct {
+	suite.Suite
+ }
+
+ func (m *MySuite) SetupSuite() {
 	log.Println("setup suite")
 	go SetupHandlers()
+ }
+ 
+ func (m *MySuite) TearDownSuite() {
+	log.Println("teardown suite")
+ }
 
-	// Return a function to teardown the test
-	return func(tb testing.TB) {
-		log.Println("teardown suite")
-	}
-}
-
-func TestHomeEndpoint(t *testing.T){
-	teardownSuite := setupSuite(t)
-	defer teardownSuite(t)
-
+func (suite *MySuite) TestHomeEndpoint(){
 	uri := "http://localhost:8080/"
 	server := newTestServer(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -39,24 +39,21 @@ func TestHomeEndpoint(t *testing.T){
 	defer server.Close()
 
 	request, err := http.NewRequest("GET", uri, nil)
-	assert.Equal(t, err, nil)
+	assert.Equal(suite.T(), err, nil)
 
 	client := &http.Client{}
 	response, err := client.Do(request)
-	assert.Equal(t, err, nil)
-	assert.Equal(t, response.StatusCode, http.StatusOK)
+	assert.Equal(suite.T(), err, nil)
+	assert.Equal(suite.T(), response.StatusCode, http.StatusOK)
 	responseBody, _ := ioutil.ReadAll(response.Body)
-	assert.Equal(t, string(responseBody), "\"I am Here! :)\"\n")
+	assert.Equal(suite.T(), string(responseBody), "\"I am Here! :)\"\n")
 
 	client.CloseIdleConnections()
 	defer response.Body.Close()
 }
 
 
-func TestUsersEndpoint(t *testing.T){
-	teardownSuite := setupSuite(t)
-	defer teardownSuite(t)
-
+func (suite *MySuite) TestUsersEndpoint(){
 	uri := "http://localhost:8080/users"
 	server := newTestServer(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -64,22 +61,19 @@ func TestUsersEndpoint(t *testing.T){
 	defer server.Close()
 
 	request, err := http.NewRequest("GET", uri, nil)
-	assert.Equal(t, err, nil)
+	assert.Equal(suite.T(), err, nil)
 
 	client := &http.Client{}
 	response, err := client.Do(request)
-	assert.Equal(t, err, nil)
-	assert.Equal(t, response.StatusCode, http.StatusOK)
+	assert.Equal(suite.T(), err, nil)
+	assert.Equal(suite.T(), response.StatusCode, http.StatusOK)
 
 	client.CloseIdleConnections()
 	defer response.Body.Close()
 }
 
 
-func TestTeamsEndpoint(t *testing.T){
-	teardownSuite := setupSuite(t)
-	defer teardownSuite(t)
-
+func (suite *MySuite) TestTeamsEndpoint(t *testing.T){
 	uri := "http://localhost:8080/teams"
 	server := newTestServer(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -87,22 +81,19 @@ func TestTeamsEndpoint(t *testing.T){
 	defer server.Close()
 
 	request, err := http.NewRequest("GET", uri, nil)
-	assert.Equal(t, err, nil)
+	assert.Equal(suite.T(), err, nil)
 
 	client := &http.Client{}
 	response, err := client.Do(request)
-	assert.Equal(t, err, nil)
-	assert.Equal(t, response.StatusCode, http.StatusOK)
+	assert.Equal(suite.T(), err, nil)
+	assert.Equal(suite.T(), response.StatusCode, http.StatusOK)
 
 	client.CloseIdleConnections()
 	defer response.Body.Close()
 }
 
 
-func TestHubsEndpoint(t *testing.T){
-	teardownSuite := setupSuite(t)
-	defer teardownSuite(t)
-
+func (suite *MySuite) TestHubsEndpoint(t *testing.T){
 	uri := "http://localhost:8080/hubs"
 	server := newTestServer(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -110,12 +101,12 @@ func TestHubsEndpoint(t *testing.T){
 	defer server.Close()
 
 	request, err := http.NewRequest("GET", uri, nil)
-	assert.Equal(t, err, nil)
+	assert.Equal(suite.T(), err, nil)
 
 	client := &http.Client{}
 	response, err := client.Do(request)
-	assert.Equal(t, err, nil)
-	assert.Equal(t, response.StatusCode, http.StatusOK)
+	assert.Equal(suite.T(), err, nil)
+	assert.Equal(suite.T(), response.StatusCode, http.StatusOK)
 
 	client.CloseIdleConnections()
 	defer response.Body.Close()
