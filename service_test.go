@@ -73,7 +73,7 @@ func (suite *MySuite) TestUsersEndpoint(){
 }
 
 
-func (suite *MySuite) TestTeamsEndpoint(t *testing.T){
+func (suite *MySuite) TestTeamsEndpoint(){
 	uri := "http://localhost:8080/teams"
 	server := newTestServer(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -93,7 +93,7 @@ func (suite *MySuite) TestTeamsEndpoint(t *testing.T){
 }
 
 
-func (suite *MySuite) TestHubsEndpoint(t *testing.T){
+func (suite *MySuite) TestHubsEndpoint(){
 	uri := "http://localhost:8080/hubs"
 	server := newTestServer(uri, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -111,3 +111,7 @@ func (suite *MySuite) TestHubsEndpoint(t *testing.T){
 	client.CloseIdleConnections()
 	defer response.Body.Close()
 }
+
+func TestServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(MySuite))
+  }
