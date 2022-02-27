@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fullstack-postgres
+  labels:
+    app: fullstack-postgres
+spec:
+  selector:
+    matchLabels:
+      app: fullstack-postgres
+      tier: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fullstack-postgres
+        tier: postgres
+    spec:
+      containers:
+        - image: postgres:latest
+          name: postgres
+          imagePullPolicy: "IfNotPresent"
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-persistent-storage
+          resources:
+            limits:
+              cpu: "2"
+              memory: 1Gi
+      volumes:
+        - name: postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: fullstack-postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+    app: fullstack-postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fullstack-postgres
+  labels:
+    app: fullstack-postgres
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+  selector:
+    app: fullstack-postgres
+    tier: postgres
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+stringData:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: productionService
+
+  DB_HOST: fullstack-postgres
+  DB_DRIVER: postgres
+  API_SECRET: 98hbun98h
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  DB_NAME: productionService
+  DB_PORT: "5432"
