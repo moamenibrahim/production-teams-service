@@ -6,24 +6,25 @@ import (
 	"github.com/rs/cors"
 	"log"
 	"net/http"
-	"encoding/json"
 
 	"production_service/migrate"
 	"production_service/router"
 )
 
-func GetHome(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("I am here! :)")
-	json.NewEncoder(w).Encode("I am Here! :)")
-}
-
-func main() {
-	// Migrate DB with data
-	migrate.MigrateDB()
-
+func SetupHandlers() {
 	// Init the mux router and endpoints
 	muxRouter := mux.NewRouter()
-	muxRouter.HandleFunc("/", GetHome).Methods("GET")
+	muxRouter.HandleFunc("/", router.GetHome).Methods("GET")
+
+	muxRouter.HandleFunc("/users", router.GetUsers).Methods("GET")
+	muxRouter.HandleFunc("/users", router.CreateUser).Methods("POST")
+	muxRouter.HandleFunc("/users/{userid}", router.GetUser).Methods("GET")
+	muxRouter.HandleFunc("/users/{userid}", router.DeleteUser).Methods("DELETE")
+
+	muxRouter.HandleFunc("/hubs", router.GetHubs).Methods("GET")
+	muxRouter.HandleFunc("/hubs", router.CreateHub).Methods("POST")
+	muxRouter.HandleFunc("/hubs/{hubid}", router.GetHub).Methods("GET")
+	muxRouter.HandleFunc("/hubs/{hubid}", router.DeleteHub).Methods("DELETE")
 
 	muxRouter.HandleFunc("/teams", router.GetTeams).Methods("GET")
 	muxRouter.HandleFunc("/teams", router.CreateTeam).Methods("POST")
@@ -34,4 +35,12 @@ func main() {
 	fmt.Println("Server at 8080")
 	handler := cors.Default().Handler(muxRouter)
 	log.Fatal(http.ListenAndServe(":8080", handler))
+}
+
+func main() {
+	// Migrate DB with data
+	migrate.MigrateDB()
+
+	// Setup handlers and endpoints
+	SetupHandlers()
 }
